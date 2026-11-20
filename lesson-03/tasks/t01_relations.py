@@ -23,14 +23,19 @@ class SecretNote:
     """
 
     def __init__(self, text, pin):
-        raise NotImplementedError("Реализуйте SecretNote.__init__")
+        self.__text = text   # name mangling: снаружи станет _SecretNote__text
+        self.__pin = pin
+        self._attempts = 0
 
     def read(self, pin):
-        raise NotImplementedError("Реализуйте SecretNote.read")
+        if pin != self.__pin:
+            self._attempts += 1
+            raise ValueError("неверный пин-код")
+        return self.__text
 
     @property
     def attempts(self):
-        raise NotImplementedError("Реализуйте SecretNote.attempts")
+        return self._attempts
 
 
 class Product:
@@ -50,14 +55,15 @@ class Product:
     """
 
     def __init__(self, name, price):
-        raise NotImplementedError("Реализуйте Product.__init__")
+        self.name = name
+        self._price = price
 
     @property
     def price(self):
-        raise NotImplementedError("Реализуйте Product.price")
+        return self._price
 
     def apply_discount(self, percent):
-        raise NotImplementedError("Реализуйте Product.apply_discount")
+        self._price = round(self._price * (1 - percent / 100), 2)
 
 
 def task_03(shapes):
@@ -78,7 +84,7 @@ def task_03(shapes):
         task_03([Circle(1), Square(2)]) == 3.14159 + 4
         task_03([]) == 0
     """
-    raise NotImplementedError("Реализуйте task_03")
+    return sum(shape.area() for shape in shapes)
 
 
 class Driver:
@@ -103,13 +109,16 @@ class Car:
     """
 
     def __init__(self, model):
-        raise NotImplementedError("Реализуйте Car.__init__")
+        self.model = model
+        self.driver = None
 
     def assign_driver(self, driver):
-        raise NotImplementedError("Реализуйте Car.assign_driver")
+        self.driver = driver
 
     def drive(self):
-        raise NotImplementedError("Реализуйте Car.drive")
+        if self.driver is None:
+            return "припаркована"
+        return f"{self.driver.name} ведёт {self.model}"
 
 
 class Employee:
@@ -137,13 +146,14 @@ class Department:
     """
 
     def __init__(self, name):
-        raise NotImplementedError("Реализуйте Department.__init__")
+        self.name = name
+        self._employees = []
 
     def add(self, employee):
-        raise NotImplementedError("Реализуйте Department.add")
+        self._employees.append(employee)  # храним ссылку на тот же объект
 
     def names(self):
-        raise NotImplementedError("Реализуйте Department.names")
+        return [employee.name for employee in self._employees]
 
 
 class Room:
@@ -169,8 +179,9 @@ class House:
     """
 
     def __init__(self, rooms_count):
-        raise NotImplementedError("Реализуйте House.__init__")
+        # дом сам создаёт свои комнаты — это композиция
+        self._rooms = [Room(f"комната {i}") for i in range(1, rooms_count + 1)]
 
     @property
     def rooms(self):
-        raise NotImplementedError("Реализуйте House.rooms")
+        return self._rooms

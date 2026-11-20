@@ -26,7 +26,9 @@ def task_25():
         task_25().log("старт")
         task_25().messages == ["старт"]   # журнал общий
     """
-    raise NotImplementedError("Реализуйте task_25")
+    if not hasattr(task_25, "instance"):  # храним объект в атрибуте самой функции
+        task_25.instance = Logger()
+    return task_25.instance
 
 
 class Pool:
@@ -47,13 +49,20 @@ class Pool:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте Pool.__new__")
+        if not hasattr(cls, "_instance"):
+            cls._instance = super().__new__(cls)
+            cls._instance._free = []    # свободные соединения
+            cls._instance._created = 0  # сколько всего создано
+        return cls._instance
 
     def acquire(self):
-        raise NotImplementedError("Реализуйте Pool.acquire")
+        if self._free:
+            return self._free.pop(0)
+        self._created += 1
+        return f"conn-{self._created}"
 
     def release(self, conn):
-        raise NotImplementedError("Реализуйте Pool.release")
+        self._free.append(conn)
 
 
 def task_27(func):
@@ -75,7 +84,13 @@ def task_27(func):
         calls == [2]              # второй раз не считали
         fast.cache == {(2,): 4}
     """
-    raise NotImplementedError("Реализуйте task_27")
+    def wrapper(*args):
+        if args not in wrapper.cache:
+            wrapper.cache[args] = func(*args)
+        return wrapper.cache[args]
+
+    wrapper.cache = {}
+    return wrapper
 
 
 class AppConfig:
@@ -94,16 +109,22 @@ class AppConfig:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте AppConfig.__new__")
+        if not hasattr(cls, "_instance"):  # объект создаётся только при первом вызове
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        if not hasattr(self, "_settings"):  # защита от повторного __init__
+            self._settings = {}
 
     def set(self, key, value):
-        raise NotImplementedError("Реализуйте AppConfig.set")
+        self._settings[key] = value
 
     def get(self, key, default=None):
-        raise NotImplementedError("Реализуйте AppConfig.get")
+        return self._settings.get(key, default)
 
     def keys(self):
-        raise NotImplementedError("Реализуйте AppConfig.keys")
+        return sorted(self._settings)
 
 
 class Registry:
@@ -123,13 +144,18 @@ class Registry:
     """
 
     def __init__(self):
-        raise NotImplementedError("Реализуйте Registry.__init__")
+        self._factories = {}
+        self._objects = {}
 
     def register(self, name, factory):
-        raise NotImplementedError("Реализуйте Registry.register")
+        self._factories[name] = factory
 
     def get(self, name):
-        raise NotImplementedError("Реализуйте Registry.get")
+        if name not in self._factories:
+            raise KeyError(name)
+        if name not in self._objects:  # создаём лениво, при первом обращении
+            self._objects[name] = self._factories[name]()
+        return self._objects[name]
 
 
 class SimpleTask:
@@ -159,7 +185,10 @@ class TaskFactory:
 
     @staticmethod
     def create(kind, name):
-        raise NotImplementedError("Реализуйте TaskFactory.create")
+        kinds = {"simple": SimpleTask, "delayed": DelayedTask}
+        if kind not in kinds:
+            raise ValueError("неизвестный тип задачи")
+        return kinds[kind](name)
 
 
 class Scheduler:
@@ -180,10 +209,15 @@ class Scheduler:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте Scheduler.__new__")
+        if not hasattr(cls, "_instance"):
+            cls._instance = super().__new__(cls)
+            cls._instance._queue = []
+        return cls._instance
 
     def add(self, task):
-        raise NotImplementedError("Реализуйте Scheduler.add")
+        self._queue.append(task)
 
     def run_all(self):
-        raise NotImplementedError("Реализуйте Scheduler.run_all")
+        results = [task.describe() for task in self._queue]
+        self._queue = []
+        return results

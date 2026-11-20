@@ -15,10 +15,13 @@ class Capital:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте Capital.__new__")
+        if not hasattr(cls, "_instance"):
+            cls._instance = super().__new__(cls)
+            cls._instance.name = "не установлен"
+        return cls._instance
 
     def rename(self, new_name):
-        raise NotImplementedError("Реализуйте Capital.rename")
+        self.name = new_name
 
 
 class Fibonacci:
@@ -38,10 +41,18 @@ class Fibonacci:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте Fibonacci.__new__")
+        if not hasattr(cls, "_instance"):  # объект создаётся только при первом вызове
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        if not hasattr(self, "_a"):  # защита от повторного __init__
+            self._a, self._b = 0, 1
 
     def next(self):
-        raise NotImplementedError("Реализуйте Fibonacci.next")
+        value = self._a
+        self._a, self._b = self._b, self._a + self._b
+        return value
 
 
 class God:
@@ -59,11 +70,13 @@ class God:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте God.__new__")
+        if not hasattr(cls, "_instance"):  # объект создаётся только при первом вызове
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
     def pray(self):
-        raise NotImplementedError("Реализуйте God.pray")
+        type(self)._prayers = type(self).prayers() + 1
 
     @classmethod
     def prayers(cls):
-        raise NotImplementedError("Реализуйте God.prayers")
+        return getattr(cls, "_prayers", 0)

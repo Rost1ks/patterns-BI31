@@ -18,13 +18,16 @@ class Settings:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте Settings.__new__")
+        if not hasattr(cls, "_instance"):
+            cls._instance = super().__new__(cls)
+            cls._instance._data = {"тема": "светлая", "язык": "ru"}
+        return cls._instance
 
     def set(self, key, value):
-        raise NotImplementedError("Реализуйте Settings.set")
+        self._data[key] = value
 
     def get(self, key, default=None):
-        raise NotImplementedError("Реализуйте Settings.get")
+        return self._data.get(key, default)
 
 
 def hw_16(func):
@@ -46,7 +49,12 @@ def hw_16(func):
         wrapped.calls == 2
         calls == [1, 2]
     """
-    raise NotImplementedError("Реализуйте hw_16")
+    def wrapper(*args, **kwargs):
+        wrapper.calls += 1
+        return func(*args, **kwargs)
+
+    wrapper.calls = 0
+    return wrapper
 
 
 class Cache:
@@ -64,10 +72,16 @@ class Cache:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте Cache.__new__")
+        if not hasattr(cls, "_instance"):  # объект создаётся только при первом вызове
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        if not hasattr(self, "_data"):  # защита от повторного __init__
+            self._data = {}
 
     def put(self, key, value):
-        raise NotImplementedError("Реализуйте Cache.put")
+        self._data[key] = value
 
     def get(self, key):
-        raise NotImplementedError("Реализуйте Cache.get")
+        return self._data.get(key)

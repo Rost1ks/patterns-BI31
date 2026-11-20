@@ -13,7 +13,9 @@ def hw_01(*args):
         hw_01() == 0
         hw_01(1, 2) == 1.5
     """
-    raise NotImplementedError("Реализуйте hw_01")
+    if not args:
+        return 0
+    return sum(args) / len(args)
 
 
 def hw_02(n):
@@ -28,7 +30,9 @@ def hw_02(n):
         hw_02(7) == 13
         hw_02(10) == 55
     """
-    raise NotImplementedError("Реализуйте hw_02")
+    if n < 2:
+        return n
+    return hw_02(n - 1) + hw_02(n - 2)
 
 
 def hw_03(tag, *items, sep=", "):
@@ -42,7 +46,7 @@ def hw_03(tag, *items, sep=", "):
         hw_03("фрукты", "яблоко", "груша", sep="; ") == "фрукты: яблоко; груша"
         hw_03("пусто") == "пусто: "
     """
-    raise NotImplementedError("Реализуйте hw_03")
+    return f"{tag}: " + sep.join(items)
 
 
 def hw_04(prefix, **kwargs):
@@ -56,4 +60,4 @@ def hw_04(prefix, **kwargs):
             == {"dev_host": "localhost"}
         hw_04("x_") == {}
     """
-    raise NotImplementedError("Реализуйте hw_04")
+    return {key: value for key, value in kwargs.items() if key.startswith(prefix)}

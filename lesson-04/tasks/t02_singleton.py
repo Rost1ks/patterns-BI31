@@ -17,7 +17,9 @@ class President:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте President.__new__")
+        if not hasattr(cls, "_instance"):  # объект создаётся только при первом вызове
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
 
 class Database:
@@ -36,10 +38,13 @@ class Database:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте Database.__new__")
+        if not hasattr(cls, "_instance"):
+            cls._instance = super().__new__(cls)
+            cls._instance._data = {"users": 42, "orders": 7}  # данные задаются один раз
+        return cls._instance
 
     def query(self, key):
-        raise NotImplementedError("Реализуйте Database.query")
+        return self._data.get(key)
 
 
 class State:
@@ -61,13 +66,21 @@ class State:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте State.__new__")
+        if not hasattr(cls, "_instance"):  # объект создаётся только при первом вызове
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        # Python вызывает __init__ при КАЖДОМ State(), даже если объект старый.
+        # Проверка hasattr не даёт затереть уже накопленные данные.
+        if not hasattr(self, "_data"):
+            self._data = {}
 
     def set(self, key, value):
-        raise NotImplementedError("Реализуйте State.set")
+        self._data[key] = value
 
     def get(self, key, default=None):
-        raise NotImplementedError("Реализуйте State.get")
+        return self._data.get(key, default)
 
 
 class IdGenerator:
@@ -86,10 +99,14 @@ class IdGenerator:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте IdGenerator.__new__")
+        if not hasattr(cls, "_instance"):
+            cls._instance = super().__new__(cls)
+            cls._instance._last = 0
+        return cls._instance
 
     def next(self):
-        raise NotImplementedError("Реализуйте IdGenerator.next")
+        self._last += 1
+        return self._last
 
 
 class Universe:
@@ -106,11 +123,14 @@ class Universe:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте Universe.__new__")
+        cls._creations = getattr(cls, "_creations", 0) + 1  # считаем КАЖДЫЙ вызов
+        if not hasattr(cls, "_instance"):
+            cls._instance = super().__new__(cls)
+        return cls._instance
 
     @classmethod
     def creations(cls):
-        raise NotImplementedError("Реализуйте Universe.creations")
+        return getattr(cls, "_creations", 0)
 
 
 class License:
@@ -129,7 +149,12 @@ class License:
     """
 
     def __new__(cls):
-        raise NotImplementedError("Реализуйте License.__new__")
+        if not hasattr(cls, "_instance"):
+            cls._instance = super().__new__(cls)
+            cls._instance.owner = None
+        return cls._instance
 
     def assign(self, owner):
-        raise NotImplementedError("Реализуйте License.assign")
+        if self.owner is not None:
+            raise ValueError("лицензия уже выдана")
+        self.owner = owner

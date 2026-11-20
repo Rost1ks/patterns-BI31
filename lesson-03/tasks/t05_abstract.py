@@ -1,5 +1,6 @@
 """Тема 5. Абстрактные классы и интерфейсы (модуль abc)."""
 
+import math
 from abc import ABC, abstractmethod
 
 
@@ -18,7 +19,7 @@ class Shape(ABC):
 
     @abstractmethod
     def area(self):
-        raise NotImplementedError("Реализуйте Shape.area")
+        pass  # абстрактный метод: реализуется в подклассах
 
 
 class Circle(Shape):
@@ -26,7 +27,7 @@ class Circle(Shape):
         self.radius = radius
 
     def area(self):
-        raise NotImplementedError("Реализуйте Circle.area")
+        return math.pi * self.radius ** 2
 
 
 class Rectangle(Shape):
@@ -35,7 +36,7 @@ class Rectangle(Shape):
         self.height = height
 
     def area(self):
-        raise NotImplementedError("Реализуйте Rectangle.area")
+        return self.width * self.height
 
 
 class Animal(ABC):
@@ -55,15 +56,15 @@ class Animal(ABC):
 
     @abstractmethod
     def speak(self):
-        raise NotImplementedError("Реализуйте Animal.speak")
+        pass  # абстрактный метод: реализуется в подклассах
 
     def introduce(self):
-        raise NotImplementedError("Реализуйте Animal.introduce")
+        return f"Я говорю: {self.speak()}"
 
 
 class Cat(Animal):
     def speak(self):
-        raise NotImplementedError("Реализуйте Cat.speak")
+        return "мяу"
 
 
 class Vehicle(ABC):
@@ -80,7 +81,7 @@ class Vehicle(ABC):
     @property
     @abstractmethod
     def max_speed(self):
-        raise NotImplementedError("Реализуйте Vehicle.max_speed")
+        pass  # абстрактный метод: реализуется в подклассах
 
 
 class Car(Vehicle):
@@ -89,7 +90,7 @@ class Car(Vehicle):
 
     @property
     def max_speed(self):
-        raise NotImplementedError("Реализуйте Car.max_speed")
+        return 220
 
 
 class Plugin(ABC):
@@ -109,11 +110,11 @@ class Plugin(ABC):
 
     @abstractmethod
     def run(self):
-        raise NotImplementedError("Реализуйте Plugin.run")
+        pass  # абстрактный метод: реализуется в подклассах
 
     @classmethod
     def subclasses(cls):
-        raise NotImplementedError("Реализуйте Plugin.subclasses")
+        return sorted(sub.__name__ for sub in cls.__subclasses__())
 
 
 class Serializable(ABC):
@@ -121,7 +122,7 @@ class Serializable(ABC):
 
     @abstractmethod
     def to_dict(self):
-        raise NotImplementedError("Реализуйте Serializable.to_dict")
+        pass  # абстрактный метод: реализуется в подклассах
 
 
 def task_35(items):
@@ -141,7 +142,7 @@ def task_35(items):
         task_35([Book("а"), Book("б")]) == [{"title": "а"}, {"title": "б"}]
         task_35([]) == []
     """
-    raise NotImplementedError("Реализуйте task_35")
+    return [item.to_dict() for item in items]
 
 
 class Item:
@@ -167,37 +168,49 @@ class Box(ABC):
 
     @abstractmethod
     def add(self, item):
-        raise NotImplementedError("Реализуйте Box.add")
+        pass  # абстрактный метод: реализуется в подклассах
 
     @abstractmethod
     def empty(self):
-        raise NotImplementedError("Реализуйте Box.empty")
+        pass  # абстрактный метод: реализуется в подклассах
 
     @abstractmethod
     def count(self):
-        raise NotImplementedError("Реализуйте Box.count")
+        pass  # абстрактный метод: реализуется в подклассах
 
 
 class ListBox(Box):
+    def __init__(self):
+        self._items = []
+
     def add(self, item):
-        raise NotImplementedError("Реализуйте ListBox.add")
+        self._items.append(item)
 
     def empty(self):
-        raise NotImplementedError("Реализуйте ListBox.empty")
+        items = self._items
+        self._items = []
+        return items
 
     def count(self):
-        raise NotImplementedError("Реализуйте ListBox.count")
+        return len(self._items)
 
 
 class DictBox(Box):
+    def __init__(self):
+        self._items = {}
+        self._next_key = 0  # ключ-номер: имена предметов могут совпадать
+
     def add(self, item):
-        raise NotImplementedError("Реализуйте DictBox.add")
+        self._items[self._next_key] = item
+        self._next_key += 1
 
     def empty(self):
-        raise NotImplementedError("Реализуйте DictBox.empty")
+        items = list(self._items.values())
+        self._items = {}
+        return items
 
     def count(self):
-        raise NotImplementedError("Реализуйте DictBox.count")
+        return len(self._items)
 
 
 def task_36(*boxes):
@@ -213,4 +226,9 @@ def task_36(*boxes):
         task_36(b1, b2, b3)
         sorted(b.count() for b in (b1, b2, b3)) == [11, 11, 12]
     """
-    raise NotImplementedError("Реализуйте task_36")
+    all_items = []
+    for box in boxes:
+        all_items.extend(box.empty())
+    # раздаём предметы по кругу: первые коробки получат на один больше
+    for i, item in enumerate(all_items):
+        boxes[i % len(boxes)].add(item)

@@ -29,7 +29,10 @@ def task_01(name):
         task_01("Visitor") == "поведенческие"
         task_01("MVC") is None
     """
-    raise NotImplementedError("Реализуйте task_01")
+    for group, patterns in GROUPS.items():
+        if name in patterns:
+            return group
+    return None
 
 
 def task_02():
@@ -41,7 +44,7 @@ def task_02():
     Примеры:
         task_02() == {"порождающие": 5, "структурные": 7, "поведенческие": 11}
     """
-    raise NotImplementedError("Реализуйте task_02")
+    return {group: len(patterns) for group, patterns in GROUPS.items()}
 
 
 def task_03(text):
@@ -62,7 +65,18 @@ def task_03(text):
         task_03("хочу уведомление подписчиков об изменениях") == "Observer"
         task_03("просто перебрать список") is None
     """
-    raise NotImplementedError("Реализуйте task_03")
+    intents = {
+        "единственный экземпляр": "Singleton",
+        "семейство связанных объектов": "Abstract Factory",
+        "пошаговая сборка сложного объекта": "Builder",
+        "копирование готового образца": "Prototype",
+        "адаптация чужого интерфейса": "Adapter",
+        "уведомление подписчиков": "Observer",
+    }
+    for phrase, pattern in intents.items():
+        if phrase in text:
+            return pattern
+    return None
 
 
 class Clicker:
@@ -82,14 +96,17 @@ class Clicker:
         other.count() == 1
     """
 
+    def __init__(self):
+        self._count = 0
+
     def click(self):
-        raise NotImplementedError("Реализуйте Clicker.click")
+        self._count += 1
 
     def count(self):
-        raise NotImplementedError("Реализуйте Clicker.count")
+        return self._count
 
     def reset(self):
-        raise NotImplementedError("Реализуйте Clicker.reset")
+        self._count = 0
 
 
 def task_05(method):
@@ -104,7 +121,13 @@ def task_05(method):
         task_05("delete") == "delete: обработан"
         task_05("patch") == "неизвестный метод"
     """
-    raise NotImplementedError("Реализуйте task_05")
+    handlers = {
+        "get": "get: обработан",
+        "post": "post: обработан",
+        "put": "put: обработан",
+        "delete": "delete: обработан",
+    }
+    return handlers.get(method, "неизвестный метод")
 
 
 class AppConfig:
@@ -123,11 +146,14 @@ class AppConfig:
         a.keys() == ["тема"]
     """
 
+    def __init__(self):
+        self._settings = {}  # у каждого экземпляра свои настройки
+
     def set(self, key, value):
-        raise NotImplementedError("Реализуйте AppConfig.set")
+        self._settings[key] = value
 
     def get(self, key, default=None):
-        raise NotImplementedError("Реализуйте AppConfig.get")
+        return self._settings.get(key, default)
 
     def keys(self):
-        raise NotImplementedError("Реализуйте AppConfig.keys")
+        return sorted(self._settings)

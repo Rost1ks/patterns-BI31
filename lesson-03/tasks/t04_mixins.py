@@ -20,7 +20,7 @@ class JSONMixin:
     """
 
     def to_json(self):
-        raise NotImplementedError("Реализуйте JSONMixin.to_json")
+        return json.dumps(self.__dict__, ensure_ascii=False)
 
 
 class ReprMixin:
@@ -40,7 +40,8 @@ class ReprMixin:
     """
 
     def __repr__(self):
-        raise NotImplementedError("Реализуйте ReprMixin.__repr__")
+        fields = ", ".join(f"{key}={value!r}" for key, value in self.__dict__.items())
+        return f"{type(self).__name__}({fields})"
 
 
 class Point(ReprMixin, JSONMixin):
@@ -76,22 +77,22 @@ class A:
     """
 
     def who(self):
-        raise NotImplementedError("Реализуйте A.who")
+        return "A"
 
 
 class B(A):
     def who(self):
-        raise NotImplementedError("Реализуйте B.who")
+        return "B->" + super().who()
 
 
 class C(A):
     def who(self):
-        raise NotImplementedError("Реализуйте C.who")
+        return "C->" + super().who()
 
 
 class D(B, C):
     def who(self):
-        raise NotImplementedError("Реализуйте D.who")
+        return "D->" + super().who()
 
 
 class TimestampMixin:
@@ -114,7 +115,9 @@ class TimestampMixin:
     """
 
     def stamp(self):
-        raise NotImplementedError("Реализуйте TimestampMixin.stamp")
+        # атрибут создаётся при первом вызове (getattr с значением по умолчанию)
+        self._stamps = getattr(self, "_stamps", 0) + 1
+        return self._stamps
 
 
 class ComparableMixin:
@@ -140,10 +143,10 @@ class ComparableMixin:
         raise NotImplementedError("Носитель миксина должен реализовать key()")
 
     def __lt__(self, other):
-        raise NotImplementedError("Реализуйте ComparableMixin.__lt__")
+        return self.key() < other.key()
 
     def __eq__(self, other):
-        raise NotImplementedError("Реализуйте ComparableMixin.__eq__")
+        return self.key() == other.key()
 
 
 class Price(ComparableMixin):
@@ -151,4 +154,4 @@ class Price(ComparableMixin):
         self.value = value
 
     def key(self):
-        raise NotImplementedError("Реализуйте Price.key")
+        return self.value

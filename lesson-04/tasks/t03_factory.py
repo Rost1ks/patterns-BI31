@@ -53,7 +53,10 @@ def task_13(kind):
         isinstance(task_13("bike"), Bike)
         task_13("train")  # ValueError: неизвестный транспорт
     """
-    raise NotImplementedError("Реализуйте task_13")
+    products = {"car": Car, "truck": Truck, "bike": Bike}
+    if kind not in products:
+        raise ValueError("неизвестный транспорт")
+    return products[kind]()
 
 
 class TransportFactory:
@@ -70,7 +73,10 @@ class TransportFactory:
 
     @classmethod
     def create(cls, kind):
-        raise NotImplementedError("Реализуйте TransportFactory.create")
+        products = {"car": Car, "truck": Truck, "bike": Bike}
+        if kind not in products:
+            raise ValueError("неизвестный транспорт")
+        return products[kind]()
 
 
 class Logistics:
@@ -94,17 +100,18 @@ class Logistics:
         raise NotImplementedError("выберите тип логистики")
 
     def deliver(self):
-        raise NotImplementedError("Реализуйте Logistics.deliver")
+        transport = self.create_transport()  # какой транспорт — решает подкласс
+        return f"{transport.name} доставляет груз"
 
 
 class RoadLogistics(Logistics):
     def create_transport(self):
-        raise NotImplementedError("Реализуйте RoadLogistics.create_transport")
+        return Car()
 
 
 class SeaLogistics(Logistics):
     def create_transport(self):
-        raise NotImplementedError("Реализуйте SeaLogistics.create_transport")
+        return Ship()
 
 
 class ShapeFactory:
@@ -124,13 +131,15 @@ class ShapeFactory:
     """
 
     def __init__(self):
-        raise NotImplementedError("Реализуйте ShapeFactory.__init__")
+        self._registry = {}
 
     def register(self, name, cls):
-        raise NotImplementedError("Реализуйте ShapeFactory.register")
+        self._registry[name] = cls
 
     def create(self, name, **kwargs):
-        raise NotImplementedError("Реализуйте ShapeFactory.create")
+        if name not in self._registry:
+            raise ValueError("неизвестный продукт")
+        return self._registry[name](**kwargs)
 
 
 def task_17(rule):
@@ -149,7 +158,14 @@ def task_17(rule):
         task_17("nonempty")("") == False
         task_17("odd")  # ValueError: неизвестное правило
     """
-    raise NotImplementedError("Реализуйте task_17")
+    rules = {
+        "positive": lambda value: value > 0,
+        "even": lambda value: value % 2 == 0,
+        "nonempty": lambda value: bool(value),
+    }
+    if rule not in rules:
+        raise ValueError("неизвестное правило")
+    return rules[rule]
 
 
 def task_18(shape, **params):
@@ -166,4 +182,10 @@ def task_18(shape, **params):
         task_18("rect", w=3, h=4).area() == 12
         task_18("square", side=5).area() == 25
     """
-    raise NotImplementedError("Реализуйте task_18")
+    if shape == "circle":
+        return Circle(params["r"])
+    if shape == "rect":
+        return Rect(params["w"], params["h"])
+    if shape == "square":
+        return Rect(params["side"], params["side"])
+    raise ValueError("неизвестная фигура")

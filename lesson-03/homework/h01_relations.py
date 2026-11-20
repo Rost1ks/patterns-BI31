@@ -20,14 +20,18 @@ class Safe:
     """
 
     def __init__(self, code):
-        raise NotImplementedError("Реализуйте Safe.__init__")
+        self.__code = code
+        self._attempts = 0
 
     def open(self, code):
-        raise NotImplementedError("Реализуйте Safe.open")
+        if code != self.__code:
+            self._attempts += 1
+            raise ValueError("неверный код")
+        return "открыто"
 
     @property
     def attempts(self):
-        raise NotImplementedError("Реализуйте Safe.attempts")
+        return self._attempts
 
 
 class Config:
@@ -49,17 +53,17 @@ class Config:
     """
 
     def __init__(self, **settings):
-        raise NotImplementedError("Реализуйте Config.__init__")
+        self.__settings = dict(settings)
 
     @property
     def settings(self):
-        raise NotImplementedError("Реализуйте Config.settings")
+        return dict(self.__settings)  # копия: снаружи изменить нельзя
 
     def update(self, key, value):
-        raise NotImplementedError("Реализуйте Config.update")
+        self.__settings[key] = value
 
     def get(self, key, default=None):
-        raise NotImplementedError("Реализуйте Config.get")
+        return self.__settings.get(key, default)
 
 
 class Player:
@@ -85,13 +89,14 @@ class Team:
     """
 
     def __init__(self, name):
-        raise NotImplementedError("Реализуйте Team.__init__")
+        self.name = name
+        self._players = []
 
     def add(self, player):
-        raise NotImplementedError("Реализуйте Team.add")
+        self._players.append(player)
 
     def roster(self):
-        raise NotImplementedError("Реализуйте Team.roster")
+        return [player.name for player in self._players]
 
 
 class Course:
@@ -108,13 +113,14 @@ class Course:
     """
 
     def __init__(self, title):
-        raise NotImplementedError("Реализуйте Course.__init__")
+        self.title = title
+        self._students = []
 
     def enroll(self, student):
-        raise NotImplementedError("Реализуйте Course.enroll")
+        self._students.append(student)
 
     def students(self):
-        raise NotImplementedError("Реализуйте Course.students")
+        return [student.name for student in self._students]
 
 
 class Student:

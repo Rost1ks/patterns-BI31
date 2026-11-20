@@ -15,7 +15,11 @@ def task_31(problem):
         task_31("создаю несколько типов фигур") == "factory"
         task_31("просто сложить два числа") == "никакой"
     """
-    raise NotImplementedError("Реализуйте task_31")
+    if "единственный" in problem:
+        return "singleton"
+    if "несколько типов" in problem:
+        return "factory"
+    return "никакой"
 
 
 def task_32(value):
@@ -29,7 +33,7 @@ def task_32(value):
         task_32(3.5) == "3.50 ₽"
         task_32(0) == "0.00 ₽"
     """
-    raise NotImplementedError("Реализуйте task_32")
+    return f"{value:.2f} ₽"
 
 
 CONFIG = {
@@ -50,7 +54,7 @@ def task_33():
         task_33() is task_33()
         task_33()["host"] == "localhost"
     """
-    raise NotImplementedError("Реализуйте task_33")
+    return CONFIG
 
 
 def task_34(animal):
@@ -65,7 +69,8 @@ def task_34(animal):
         task_34("собака") == "гав"
         task_34("дракон") == "..."
     """
-    raise NotImplementedError("Реализуйте task_34")
+    sounds = {"кот": "мяу", "собака": "гав", "корова": "му"}
+    return sounds.get(animal, "...")
 
 
 class ConsoleChannel:
@@ -94,10 +99,10 @@ class Notifier:
     """
 
     def __init__(self, channels):
-        raise NotImplementedError("Реализуйте Notifier.__init__")
+        self.channels = channels
 
     def notify(self, message):
-        raise NotImplementedError("Реализуйте Notifier.notify")
+        return [channel.send(message) for channel in self.channels]
 
 
 def task_36(situation):
@@ -115,4 +120,13 @@ def task_36(situation):
         task_36("подкласс решает, что создавать") == "Factory Method"
         task_36("хочу красивый интерфейс") is None
     """
-    raise NotImplementedError("Реализуйте task_36")
+    table = {
+        "один экземпляр и глобальный доступ": "Singleton",
+        "семейство продуктов одной темы": "Abstract Factory",
+        "подкласс решает, что создавать": "Factory Method",
+        "простая функция решает задачу": "никакой",
+    }
+    for phrase, pattern in table.items():
+        if phrase in situation:
+            return pattern
+    return None

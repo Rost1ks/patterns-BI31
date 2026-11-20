@@ -11,7 +11,7 @@ class Engine:
         self.power = power
 
     def start(self):
-        raise NotImplementedError("Реализуйте Engine.start")
+        return "двигатель запущен"
 
 
 class Car:
@@ -28,14 +28,15 @@ class Car:
     """
 
     def __init__(self, model, engine):
-        raise NotImplementedError("Реализуйте Car.__init__")
+        self.model = model
+        self.engine = engine
 
     @property
     def horsepower(self):
-        raise NotImplementedError("Реализуйте Car.horsepower")
+        return self.engine.power
 
     def start(self):
-        raise NotImplementedError("Реализуйте Car.start")
+        return self.engine.start()  # делегируем двигателю
 
 
 class Address:
@@ -58,10 +59,12 @@ class Person:
     """
 
     def __init__(self, name, address):
-        raise NotImplementedError("Реализуйте Person.__init__")
+        self.name = name
+        self.address = address
 
     def full_address(self):
-        raise NotImplementedError("Реализуйте Person.full_address")
+        a = self.address
+        return f"{a.city}, {a.street}, {a.house}"
 
 
 class Chapter:
@@ -89,16 +92,18 @@ class Manual:
     """
 
     def __init__(self, title):
-        raise NotImplementedError("Реализуйте Manual.__init__")
+        self.title = title
+        self._chapters = []
 
     def add(self, chapter):
-        raise NotImplementedError("Реализуйте Manual.add")
+        self._chapters.append(chapter)
 
     def total_pages(self):
-        raise NotImplementedError("Реализуйте Manual.total_pages")
+        return sum(chapter.pages for chapter in self._chapters)
 
     def longest_chapter(self):
-        raise NotImplementedError("Реализуйте Manual.longest_chapter")
+        # max возвращает первый из равных, поэтому при равенстве — первая добавленная
+        return max(self._chapters, key=lambda chapter: chapter.pages).title
 
 
 class Service:
@@ -119,10 +124,14 @@ class Service:
     """
 
     def __init__(self, name, logger):
-        raise NotImplementedError("Реализуйте Service.__init__")
+        self.name = name
+        self.logger = logger
 
     def run(self, x):
-        raise NotImplementedError("Реализуйте Service.run")
+        self.logger.log(f"старт: {x}")
+        result = f"готово: {x}"
+        self.logger.log(f"финиш: {x}")
+        return result
 
 
 class Track:
@@ -150,16 +159,20 @@ class Playlist:
     """
 
     def __init__(self, name):
-        raise NotImplementedError("Реализуйте Playlist.__init__")
+        self.name = name
+        self._tracks = []
 
     def add(self, track):
-        raise NotImplementedError("Реализуйте Playlist.add")
+        self._tracks.append(track)
 
     def total_duration(self):
-        raise NotImplementedError("Реализуйте Playlist.total_duration")
+        return sum(track.duration for track in self._tracks)
 
     def find(self, title):
-        raise NotImplementedError("Реализуйте Playlist.find")
+        for track in self._tracks:
+            if track.title == title:
+                return track
+        return None
 
 
 class Item:
@@ -187,13 +200,13 @@ class Cart:
     """
 
     def __init__(self):
-        raise NotImplementedError("Реализуйте Cart.__init__")
+        self._items = []
 
     def add(self, item):
-        raise NotImplementedError("Реализуйте Cart.add")
+        self._items.append(item)
 
     def total(self):
-        raise NotImplementedError("Реализуйте Cart.total")
+        return sum(item.price * item.quantity for item in self._items)
 
     def most_expensive(self):
-        raise NotImplementedError("Реализуйте Cart.most_expensive")
+        return max(self._items, key=lambda item: item.price)
